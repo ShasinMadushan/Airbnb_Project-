@@ -18,6 +18,7 @@ def clean_listings():
     print("Cleaning data...")
     # 1. Standardize Price
     df['price'] = df['price'].apply(clean_price)
+    df = df.dropna(subset=['price'])
     
     # 2. Parse Dates (converting to standard datetime)
     df['host_since'] = pd.to_datetime(df['host_since'], errors='coerce')
