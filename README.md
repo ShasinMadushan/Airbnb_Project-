@@ -22,8 +22,11 @@ Airbnb_Project/
 │       ├── clean_listings.py     # Core ELT script (handles nulls, types, standardization)
 │       └── export_to_parquet.py  # Pipeline stage to generate BI-ready Parquet files
 ├── dashboard/                # Power BI (.pbix) and PDF exports
-└── README.md
-🛠️ Engineering Decision Log
+└── README.md          
+
+
+
+## 🛠️ Engineering Decision Log
 During the development of this pipeline, several architectural decisions were made to prioritize data quality and system stability:
 
 DuckDB for Local Analytics: Selected DuckDB over traditional RDBMS systems to leverage its vectorized query execution on local hardware without the overhead of server management.
@@ -47,7 +50,7 @@ Clone the repository and activate your virtual environment.
 Execute the data cleaning and loading script:
 
          python src/transformation/clean_listings.py
-         
+
 Generate the BI-ready Parquet file:
 
         python src/transformation/export_to_parquet.py
