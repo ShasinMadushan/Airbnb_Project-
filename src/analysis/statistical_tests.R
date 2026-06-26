@@ -8,7 +8,8 @@ library(effsize)
 cat("--- Running Statistical Analysis in R ---\n\n")
 
 # Connect to your existing DuckDB database
-con <- dbConnect(duckdb::duckdb(), dbdir = "data/processed/airbnb.duckdb", read_only = TRUE)
+con <- dbConnect(duckdb::duckdb(), dbdir = "Desktop/Airbnb_Project/data/processed/airbnb.duckdb", read_only = TRUE)
+
 
 # ---------------------------------------------------------
 # Hypothesis 1: Entire homes cost more than Private rooms
@@ -54,3 +55,4 @@ cat("Cohen's d:", effect_2$estimate, "\n\n")
 
 # Disconnect
 dbDisconnect(con)
+# 
