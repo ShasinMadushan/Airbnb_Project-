@@ -1,11 +1,14 @@
 import duckdb
 
 def run_export():
-    print("Exporting data to Parquet...")
+    print("Exporting unified global data to Parquet...")
     con = duckdb.connect('data/processed/airbnb.duckdb')
-    # This command creates the file Power BI can read easily
-    con.execute("COPY (SELECT * FROM listings) TO 'data/processed/london_listings.parquet' (FORMAT PARQUET)")
-    print("Export complete! File is at: data/processed/london_listings.parquet")
+    
+    # Updated filename to accurately reflect our 3-city global dataset
+    con.execute("COPY (SELECT * FROM listings) TO 'data/processed/global_listings.parquet' (FORMAT PARQUET)")
+    
+    con.close()
+    print("Export complete! Unified file is at: data/processed/global_listings.parquet")
 
 if __name__ == "__main__":
     run_export()

@@ -1,55 +1,51 @@
 import pandas as pd
 import duckdb
-import os
 
-def clean_price(price_str):
-    """Removes $ and commas, converts to float."""
-    if pd.isna(price_str):
-        return None
-    return float(str(price_str).replace('$', '').replace(',', ''))
+def process_multiple_cities():
+    # Configuration dictionary mapping the city to its file and exchange rate (to Base GBP £)
+    cities = {
+        'london': {'file': 'london_listings.csv.gz', 'currency_rate': 1.0},    # Base GBP
+        'tokyo': {'file': 'tokyo_listings.csv.gz', 'currency_rate': 190.0},  # ~190 JPY to 1 GBP
+        'nyc': {'file': 'nyc_listings.csv.gz', 'currency_rate': 1.25}        # ~1.25 USD to 1 GBP
+    }
+    
+    all_cleaned_data = []
+    print("Starting Global ELT Pipeline...")
 
-def clean_listings():
-    print("Loading raw listings...")
-    raw_path = "data/raw/london_listings.csv.gz"
-    
-    # Load data
-    df = pd.read_csv(raw_path, compression='gzip', low_memory=False)
-    
-    print("Cleaning data...")
-    # 1. Standardize Price
-    df['price'] = df['price'].apply(clean_price)
-    df = df.dropna(subset=['price'])
-    
-    # 2. Parse Dates (converting to standard datetime)
-    df['host_since'] = pd.to_datetime(df['host_since'], errors='coerce')
-    df['last_scraped'] = pd.to_datetime(df['last_scraped'], errors='coerce')
-    
-    # 3. Handle a few basic missing values for cleaner analytics later
-    df['name'] = df['name'].fillna("Unknown")
-    df['host_name'] = df['host_name'].fillna("Unknown")
-    
-    # Select only the columns we actually need for analysis (keeps DB small and fast)
-    cols_to_keep = [
-        'id', 'name', 'host_id', 'host_name', 'host_since', 'host_is_superhost',
-        'neighbourhood_cleansed', 'latitude', 'longitude', 'property_type',
-        'room_type', 'accommodates', 'bedrooms', 'beds', 'price', 
-        'number_of_reviews', 'review_scores_rating'
-    ]
-    
-    df_clean = df[cols_to_keep]
-    
-    print("Saving to DuckDB...")
-    os.makedirs("data/processed", exist_ok=True)
-    db_path = "data/processed/airbnb.duckdb"
-    
-    # Connect to DuckDB and save the dataframe as a table
-    with duckdb.connect(db_path) as con:
-        # Create or replace the table
-        con.execute("CREATE OR REPLACE TABLE listings AS SELECT * FROM df_clean")
+    for city, config in cities.items():
+        file_path = f"data/raw/{config['file']}"
+        print(f"Processing {city.upper()}...")
         
-        # Verify it worked
-        count = con.execute("SELECT count(*) FROM listings").fetchone()[0]
-        print(f"Successfully loaded {count} clean records into DuckDB.")
+        # 1. Read the raw data
+        df = pd.read_csv(file_path, low_memory=False)
+        
+        # 2. Add the City column for the Power BI Dashboard
+        df['city_name'] = city.upper()
+        
+        # 3. Apply baseline quality gates (drop null prices)
+        df = df.dropna(subset=['price']) 
+        
+        # 4. Clean pricing strings (Handling $, £, ¥, and commas)
+        if df['price'].dtype == 'O':
+            df['price'] = df['price'].replace({r'\$': '', r'£': '', r'¥': '', r',': ''}, regex=True).astype(float)
+            
+        # 5. Currency Harmonization (Converting everything to Base GBP £)
+        if config['currency_rate'] != 1.0:
+            print(f"   Converting currency to Base (£)...")
+            df['price'] = df['price'] / config['currency_rate']
+        
+        all_cleaned_data.append(df)
+
+    # Combine all cities into one massive DataFrame
+    master_df = pd.concat(all_cleaned_data, ignore_index=True)
+    print(f"Global Dataset Ready: {len(master_df)} total rows.")
+
+    # Write to DuckDB (Overwriting the old table with the new global data)
+    con = duckdb.connect('data/processed/airbnb.duckdb')
+    con.execute("CREATE OR REPLACE TABLE listings AS SELECT * FROM master_df")
+    con.close()
+    
+    print("Multi-City Data successfully saved to DuckDB")
 
 if __name__ == "__main__":
-    clean_listings()
+    process_multiple_cities()
