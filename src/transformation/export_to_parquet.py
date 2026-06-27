@@ -4,7 +4,7 @@ def run_export():
     print("Exporting unified global data to Parquet...")
     con = duckdb.connect('data/processed/airbnb.duckdb')
     
-    # Updated filename to accurately reflect our 3-city global dataset
+    
     con.execute("COPY (SELECT * FROM listings) TO 'data/processed/global_listings.parquet' (FORMAT PARQUET)")
     
     con.close()
