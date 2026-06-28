@@ -4,5 +4,4 @@ services:
     build: .
     container_name: airbnb-elt-pipeline
     volumes:
-      # This maps your local data folder to the container so you keep the output
       - ./data:/app/data

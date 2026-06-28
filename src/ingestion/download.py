@@ -2,7 +2,7 @@ import os
 import requests
 from tqdm import tqdm
 
-# Direct, active links to London datasets
+
 URLS = {
     "listings": "https://data.insideairbnb.com/united-kingdom/england/london/2024-09-06/data/listings.csv.gz",
     "calendar": "https://data.insideairbnb.com/united-kingdom/england/london/2024-09-06/data/calendar.csv.gz",

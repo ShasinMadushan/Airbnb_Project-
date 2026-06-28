@@ -1,10 +1,10 @@
 import duckdb
 
 def get_sentiment_insight():
-    # Connect to your data warehouse
+   
     con = duckdb.connect('data/processed/airbnb.duckdb', read_only=True)
     
-    # SQL query joining your core data with your new AI emotional data
+    
     query = """
     SELECT 
         l.host_is_superhost as is_superhost, 
@@ -17,11 +17,11 @@ def get_sentiment_insight():
     GROUP BY l.host_is_superhost
     """
     
-    print("\n📊 AI Sentiment Analysis: Superhost vs. Standard Host")
+    print("\nAI Sentiment Analysis: Superhost vs. Standard Host")
     print("-" * 60)
     result = con.execute(query).fetchdf()
     
-    # Format the output so it reads cleanly in the terminal
+ 
     result['is_superhost'] = result['is_superhost'].map({'t': 'Yes', 'f': 'No'})
     print(result.to_string(index=False))
     print("-" * 60)

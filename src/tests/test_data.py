@@ -2,7 +2,7 @@ import duckdb
 import pytest
 import os
 
-# Define the path to your database
+
 DB_PATH = "data/processed/airbnb.duckdb"
 
 @pytest.fixture

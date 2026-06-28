@@ -1,56 +1,27 @@
-# Airbnb London Market Analysis: End-to-End Data Pipeline
+# Global Airbnb Market Analysis & Predictive Modeling
 
-## 📌 Project Overview
-This project is a complete end-to-end data engineering and analytics pipeline designed to analyze Airbnb listings in the London market. The goal is to uncover actionable business insights regarding geographic pricing gradients, host behavior (Superhost status), and market distribution.
+## Project Overview
+This project is an end-to-end Data Engineering and Machine Learning pipeline analyzing the global Airbnb market across three major cities (London, Tokyo, NYC). It features an automated ELT architecture, multi-currency financial harmonization, predictive pricing models, and a custom Natural Language Processing (NLP) engine to analyze over 2 million guest reviews.
 
-## 🏗️ Architecture & Tech Stack
-This project implements a decoupled data architecture, separating the heavy data transformations from the final visualization layer to ensure high performance and scalability.
+## Core Architecture & Tech Stack
+* **Data Warehouse:** DuckDB (Local, columnar analytics)
+* **Data Engineering (ELT):** Python (Pandas)
+* **Machine Learning & Stats:** R (RandomForest, DBI, effsize)
+* **Artificial Intelligence (NLP):** Python (VADER SentimentIntensityAnalyzer)
+* **Infrastructure:** Docker & Docker Compose
 
-* **Data Processing:** Python (`pandas`)
-* **Local Data Warehouse:** DuckDB (In-process analytical database)
-* **Optimized Storage:** Parquet (Columnar storage for BI performance)
-* **Visualization Layer:** Microsoft Power BI
+## Key Features & Pipeline Steps
+1. **Global Data Ingestion & Transformation:** Extracted >100,000 raw listings across three continents. Engineered a Python transformation pipeline to clean text-based currency strings (`£`, `$`, `¥`) and dynamically harmonize all valuations into a single base currency (£) for cross-market comparison.
+2. **Predictive Pricing Models:** Trained isolated Random Forest regressors in R for the London and Tokyo markets to identify key pricing drivers and calculate Mean Absolute Error (MAE) for market predictability.
+3. **Statistical Testing:** Executed Welch's t-tests and calculated Cohen's d effect sizes to mathematically prove the impact of Room Type and Superhost status on pricing and guest satisfaction.
+4. **AI Sentiment Analysis (Micro-Batching):** Engineered a custom NLP pipeline to read and score the emotional sentiment of >2.1 million written guest reviews. 
 
-## 📂 Project Structure
-```text
-Airbnb_Project/
-├── data/
-│   ├── raw/                  # Compressed raw CSV files (e.g., london_listings.csv.gz)
-│   └── processed/            # Cleaned database (airbnb.duckdb) and exports (.parquet)
-├── src/
-│   └── transformation/
-│       ├── clean_listings.py     # Core ELT script (handles nulls, types, standardization)
-│       └── export_to_parquet.py  # Pipeline stage to generate BI-ready Parquet files
-├── dashboard/                # Power BI (.pbix) and PDF exports
-└── README.md          
+## Infrastructure & Execution Strategy
+**Containerization vs. Bare-Metal Execution:** A `Dockerfile` is provided for containerized execution of the baseline ELT pipeline (`clean_listings.py`). However, due to the massive scale of the NLP text processing (2.1M+ records) and the risk of CPU thermal throttling or WHEA hardware interrupts on standard local machines, the primary AI pipeline (`src/analytics/sentiment.py`) was engineered to run natively. It utilizes a custom micro-batching architecture with enforced hardware-cooling pauses, ensuring 100% data processing success without system degradation.
 
-
-
-## 🛠️ Engineering Decision Log
-During the development of this pipeline, several architectural decisions were made to prioritize data quality and system stability:
-
-DuckDB for Local Analytics: Selected DuckDB over traditional RDBMS systems to leverage its vectorized query execution on local hardware without the overhead of server management.
-
-Strict Data Quality Gates: Implemented hard validation in clean_listings.py. Rows with critical missing values (e.g., price) are explicitly dropped during the Python transformation phase, ensuring 100% data integrity before it reaches the Gold/Presentation layer.
-
-Parquet Integration over ODBC: Initially evaluated connecting Power BI directly to DuckDB via ODBC. Pivoted to a decoupled Parquet export strategy to bypass local environment dependencies, eliminate authentication bottlenecks, and natively preserve schema data types for Power BI.
-
-📊 Key Business Insights
-(Note: See the exported PDF dashboard for visual context)
-
-Geographic Pricing Gradients: Mapped the concentration of high-value listings, highlighting premium pricing zones in central London compared to outer boroughs.
-
-Superhost Market Share: Analyzed the distinct count of properties managed by Superhosts vs. standard hosts to determine market concentration.
-
-Room Type Revenue Drivers: Segmented inventory by room type to identify the most frequent listing configurations (e.g., Entire Home vs. Private Room).
-
-🚀 How to Run the Pipeline
-Clone the repository and activate your virtual environment.
-
-Execute the data cleaning and loading script:
-
-         python src/transformation/clean_listings.py
-
-Generate the BI-ready Parquet file:
-
-        python src/transformation/export_to_parquet.py
+## Repository Structure
+* `data/raw/` - Compressed, original source files from Inside Airbnb.
+* `data/processed/` - The compiled DuckDB data warehouse and finalized Parquet files.
+* `src/transformation/` - Python ELT scripts for cleaning and currency conversion.
+* `src/analytics/` - Python scripts for NLP sentiment scoring.
+* `src/analysis/` - R scripts for Random Forest modeling and statistical hypothesis testing.

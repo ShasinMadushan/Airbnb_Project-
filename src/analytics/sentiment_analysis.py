@@ -6,7 +6,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 def analyze_sentiment():
     print("Booting up Analysis")
 
-    # Limiting to 10,000 rows to prevent CPU thermal throttling
+   
     print("Reading reviews...")
     try:
         df = pd.read_csv("data/raw/london_reviews.csv.gz", nrows=10000, low_memory=False)
@@ -16,7 +16,7 @@ def analyze_sentiment():
 
     df = df.dropna(subset=['comments'])
     
-    # Initialize the standalone AI
+  
     sia = SentimentIntensityAnalyzer()
     
     print(f"Scoring {len(df)} guest reviews...")
