@@ -13,8 +13,7 @@ run_city_stats <- function(target_city) {
   con <- dbConnect(duckdb::duckdb(), dbdir = "Desktop/Airbnb_Project/data/processed/airbnb.duckdb", read_only = TRUE)
   
 
-  # Hypothesis 1: Entire homes cost more than Private rooms
-  # ---------------------------------------------------------
+
   cat("Hypothesis 1: Entire-home listings command higher prices than private rooms.\n")
   query_h1 <- sprintf("
       SELECT room_type, price 
@@ -36,8 +35,7 @@ run_city_stats <- function(target_city) {
   cat("Cohen's d:", effect_1$estimate, "\n\n")
   
  
-  # Hypothesis 2: Superhosts get higher review scores
-  # ---------------------------------------------------------
+
   cat("Hypothesis 2: Superhost listings achieve higher review scores than non-superhosts.\n")
   query_h2 <- sprintf("
       SELECT host_is_superhost, review_scores_rating 

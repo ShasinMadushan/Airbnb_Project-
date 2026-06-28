@@ -21,7 +21,7 @@ def run_chunked_sentiment():
     try:
         chunks = pd.read_csv("data/raw/london_reviews.csv.gz", chunksize=chunk_size, low_memory=False)
     except FileNotFoundError:
-        print("❌ Error: london_reviews.csv.gz not found.")
+        print(" Error: london_reviews.csv.gz not found.")
         return
 
     for i, chunk in enumerate(chunks):

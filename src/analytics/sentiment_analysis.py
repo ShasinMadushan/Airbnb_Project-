@@ -1,6 +1,5 @@
 import pandas as pd
 import duckdb
-# We swapped NLTK for the standalone package to bypass the network error
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 def analyze_sentiment():

@@ -1,6 +1,6 @@
 import pandas as pd
 
-# Define the paths to your manually renamed files
+
 FILES = {
     "listings": "data/raw/london_listings.csv.gz",
     "calendar": "data/raw/london_calendar.csv.gz",
@@ -10,12 +10,12 @@ FILES = {
 def peek_data(name, path):
     print(f"\n--- Profiling {name.upper()} ---")
     try:
-        # Read only the first 5 rows to save memory
+        
         df = pd.read_csv(path, nrows=5, compression='gzip')
         print(f"Columns: {len(df.columns)}")
         print(f"Sample Columns: {list(df.columns)[:5]}...")
         
-        # Count total rows efficiently in chunks
+        
         chunk_iter = pd.read_csv(path, chunksize=100000, compression='gzip', usecols=[0])
         total_rows = sum(len(chunk) for chunk in chunk_iter)
         print(f"Total Rows: {total_rows:,}")
